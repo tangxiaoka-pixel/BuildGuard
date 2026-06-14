@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+dist/
+target/
+.idea/
+.vscode/
+*.log
+*.tsbuildinfo
+.runtime/
+backend/data/

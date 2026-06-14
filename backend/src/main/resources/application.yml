@@ -1,0 +1,21 @@
+server:
+  port: ${SERVER_PORT:8082}
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:h2:file:./data/smart-site;MODE=PostgreSQL}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

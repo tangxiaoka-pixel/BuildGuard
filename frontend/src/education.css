@@ -1,0 +1,1 @@
+.question-options{width:100%;display:flex;flex-direction:column;gap:10px}.question-option{display:grid;grid-template-columns:24px 1fr 44px;gap:8px;align-items:center}.question-option>span{font-weight:700;color:#58718a}.form-tip{display:block;color:#8a9bab;margin-top:7px}.el-select{width:100%}

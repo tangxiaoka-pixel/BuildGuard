@@ -1,0 +1,19 @@
+[Unit]
+Description=BuildGuard Smart Construction Backend
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/buildguard
+Environment="SERVER_PORT=18082"
+Environment="DB_URL=jdbc:h2:file:/opt/buildguard/data/smart-site;MODE=PostgreSQL"
+Environment="PUBLIC_FRONTEND_URL=http://122.51.227.54/buildguard"
+ExecStart=/usr/bin/java -jar /opt/buildguard/buildguard-api.jar --server.address=127.0.0.1 --spring.h2.console.enabled=false
+Restart=always
+RestartSec=5
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

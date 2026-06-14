@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.buildguard.backend</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/tangkai/Desktop/BuildGuard/.runtime/jdk-17.0.19+10/Contents/Home/bin/java</string>
+    <string>-jar</string>
+    <string>/Users/tangkai/Desktop/BuildGuard/backend/target/buildguard-api-1.0.0.jar</string>
+    <string>--server.address=127.0.0.1</string>
+    <string>--server.port=8082</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/tangkai/Desktop/BuildGuard/backend</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/tangkai/Desktop/BuildGuard/.runtime/logs/backend-launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/tangkai/Desktop/BuildGuard/.runtime/logs/backend-launchd-error.log</string>
+</dict>
+</plist>
