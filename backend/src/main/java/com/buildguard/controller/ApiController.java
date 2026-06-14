@@ -45,10 +45,13 @@ public class ApiController {
         String username=text(body.get("username")),password=text(body.get("password"));
         Optional<PlatformUser> platformAccount=platformUsers.findByPhone(username).or(()->platformUsers.findByUsername(username));
         if(platformAccount.isPresent()) {
-            AuthService.LoginResult login=authService.login(username,password);
-            List<Project> managed=visibleProjects(login.scope()).stream().filter(p->isProjectManager(login.scope(),p.getId())).toList();
-            if(managed.isEmpty())throw new BusinessException("仅项目管理员或班组长可以登录");
-            return ApiResponse.ok(Map.of("token",login.token(),"actorType","PROJECT_MANAGER","name",login.user().getName(),"projects",managed));
+            try {
+                AuthService.LoginResult login=authService.login(username,password);
+                List<Project> managed=visibleProjects(login.scope()).stream().filter(p->isProjectManager(login.scope(),p.getId())).toList();
+                if(!managed.isEmpty())return ApiResponse.ok(Map.of("token",login.token(),"actorType","PROJECT_MANAGER","name",login.user().getName(),"projects",managed));
+            } catch(BusinessException ignored) {
+                // The same phone can be both a platform account and a worker team leader.
+            }
         }
         Worker leader=workers.findAll().stream().filter(w->Boolean.TRUE.equals(w.getTeamLeader())&&username.equals(w.getPhone())&&authService.verify(password,w.getTeamLeaderPassword())).findFirst().orElseThrow(()->new BusinessException("账号或密码错误，或当前人员不是班组长"));
         String token=UUID.randomUUID().toString();h5Sessions.put(token,new H5Actor("TEAM_LEADER",leader.getId(),Set.of(leader.getProjectId()),leader.getTeamId()));
@@ -61,7 +64,6 @@ public class ApiController {
     }
     @PostMapping("/h5/worker-entry/id-card-ocr")
     ApiResponse<Map<String,Object>> h5IdCardOcr(jakarta.servlet.http.HttpServletRequest req,@RequestBody(required=false) Map<String,Object> body){h5Actor(req);return ApiResponse.ok(Map.of("name","待核验人员","idCardNo","330681199001011234","gender","男","nation","汉","birthDate","1990-01-01","address","身份证照片模拟识别地址"));}
-    @Transactional
     @PostMapping("/h5/worker-entry/workers")
     ApiResponse<Map<String,Object>> h5AddWorker(jakarta.servlet.http.HttpServletRequest req,@RequestBody Worker v){
         H5Actor actor=h5Actor(req);if(!actor.projectIds().contains(v.getProjectId()))throw new BusinessException("无权向该项目新增人员");

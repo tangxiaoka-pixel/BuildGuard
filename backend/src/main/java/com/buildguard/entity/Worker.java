@@ -33,6 +33,8 @@ public class Worker extends BaseEntity {
     private String avatarUrl;
     @Lob
     private String idCardPhotoUrl;
+    @Lob
+    private String idCardBackPhotoUrl;
     private String bankCardNo;
     private String emergencyContact;
     private String emergencyPhone;
