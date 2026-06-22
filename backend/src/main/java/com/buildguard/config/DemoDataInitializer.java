@@ -4,6 +4,7 @@ import com.buildguard.entity.PlatformUser;
 import com.buildguard.entity.ScopeRole;
 import com.buildguard.entity.Tenant;
 import com.buildguard.repository.CompanyRepository;
+import com.buildguard.repository.OpenApiClientRepository;
 import com.buildguard.repository.PlatformUserRepository;
 import com.buildguard.repository.ProjectRepository;
 import com.buildguard.repository.ScopeRoleRepository;
@@ -23,6 +24,7 @@ public class DemoDataInitializer {
     private final CompanyRepository companies;
     private final ProjectRepository projects;
     private final ScopeRoleRepository scopeRoles;
+    private final OpenApiClientRepository openApiClients;
 
     @Bean
     CommandLineRunner systemAccountInitializer() {
@@ -59,6 +61,15 @@ public class DemoDataInitializer {
                     });
             companies.findAll().forEach(company -> seedRoles("COMPANY", company.getId()));
             projects.findAll().forEach(project -> seedRoles("PROJECT", project.getId()));
+            openApiClients.findByApiKey("buildguard-demo").orElseGet(() -> openApiClients.save(com.buildguard.entity.OpenApiClient.builder()
+                    .apiKey("buildguard-demo")
+                    .apiSecret("buildguard-secret")
+                    .vendorName("演示设备厂家")
+                    .contactName("联调联系人")
+                    .contactPhone("13800000000")
+                    .status("ACTIVE")
+                    .remark("默认联调账号，可在开放接入页面停用或修改")
+                    .build()));
         };
     }
 

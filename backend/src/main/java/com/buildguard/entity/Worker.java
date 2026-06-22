@@ -43,6 +43,13 @@ public class Worker extends BaseEntity {
     private String realNameReportStatus;
     private LocalDateTime realNameReportedAt;
     private String realNameReportResult;
+    private String source;
+    private String externalPlatform;
+    private String externalEmpId;
+    private Boolean autoCreated;
+    private Boolean confirmed;
+    private String confirmedBy;
+    private LocalDateTime confirmedAt;
     private Boolean teamLeader;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String teamLeaderPassword;

@@ -2,6 +2,7 @@ package com.buildguard.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -23,4 +24,10 @@ public class AttendanceRecord extends BaseEntity {
     private String accessResult;
     private String denyReason;
     private String reportStatus;
+    private String externalEmpId;
+    private String matchStatus;
+    @Lob
+    private String rawData;
+    private Boolean abnormal;
+    private String abnormalReason;
 }

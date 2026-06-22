@@ -8,4 +8,6 @@ public interface WorkerRepository extends JpaRepository<Worker, Long> {
     Optional<Worker> findByIdCardNo(String idCardNo);
     Optional<Worker> findByQrToken(String qrToken);
     List<Worker> findByProjectId(Long projectId);
+    Optional<Worker> findByProjectIdAndExternalEmpId(Long projectId, String externalEmpId);
+    List<Worker> findByProjectIdAndName(Long projectId, String name);
 }
