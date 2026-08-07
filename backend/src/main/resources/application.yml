@@ -1,6 +1,10 @@
 server:
   port: ${SERVER_PORT:8082}
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   datasource:
     url: ${DB_URL:jdbc:h2:file:./data/smart-site;MODE=PostgreSQL}
     username: ${DB_USERNAME:sa}
