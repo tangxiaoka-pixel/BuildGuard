@@ -12,6 +12,9 @@ public class IotDevice extends BaseEntity {
     private String deviceCode;
     private String deviceName;
     private String deviceType;
+    private String nodeType;
+    private String parentDeviceCode;
+    private String protocol;
     private String vendorName;
     private String apiKey;
     private String apiSecret;
