@@ -1,8 +1,10 @@
 package com.buildguard.service;
 
 import com.buildguard.entity.PlatformUser;
+import com.buildguard.entity.ScopeRole;
 import com.buildguard.exception.BusinessException;
 import com.buildguard.repository.PlatformUserRepository;
+import com.buildguard.repository.ScopeRoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class AuthService {
     private final PlatformUserRepository users;
+    private final ScopeRoleRepository scopeRoles;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final Map<String, AuthScope> sessions = new ConcurrentHashMap<>();
 
@@ -32,7 +35,15 @@ public class AuthService {
         user.setLastLoginTime(LocalDateTime.now());
         users.save(user);
         String token = UUID.randomUUID().toString();
-        AuthScope scope = new AuthScope(user.getId(), user.getRole(), Set.copyOf(user.getCompanyIds()), Set.copyOf(user.getAllProjectCompanyIds()), Set.copyOf(user.getProjectIds()));
+        Set<Long> companyLevelCompanyIds = "COMPANY_ADMIN".equals(user.getRole())
+                ? Set.copyOf(user.getCompanyIds())
+                : user.getCompanyRoleIds().stream()
+                .map(scopeRoles::findById)
+                .flatMap(Optional::stream)
+                .filter(role -> "COMPANY".equals(role.getScopeType()) && "ACTIVE".equals(role.getStatus()))
+                .map(ScopeRole::getScopeId)
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+        AuthScope scope = new AuthScope(user.getId(), user.getRole(), Set.copyOf(user.getCompanyIds()), companyLevelCompanyIds, Set.copyOf(user.getAllProjectCompanyIds()), Set.copyOf(user.getProjectIds()));
         sessions.put(token, scope);
         return new LoginResult(token, user, scope);
     }
@@ -68,9 +79,10 @@ public class AuthService {
     }
 
     public record LoginResult(String token, PlatformUser user, AuthScope scope) {}
-    public record AuthScope(Long userId, String role, Set<Long> companyIds, Set<Long> allProjectCompanyIds, Set<Long> projectIds) {
+    public record AuthScope(Long userId, String role, Set<Long> companyIds, Set<Long> companyLevelCompanyIds, Set<Long> allProjectCompanyIds, Set<Long> projectIds) {
         public boolean superAdmin() { return "SUPER_ADMIN".equals(role); }
         public boolean companyAdmin() { return "COMPANY_ADMIN".equals(role); }
+        public boolean canEnterCompany(Long companyId) { return superAdmin() || companyLevelCompanyIds.contains(companyId); }
         public boolean canAccessCompany(Long companyId) { return superAdmin() || companyIds.contains(companyId); }
         public boolean canAccessProject(Long companyId, Long projectId) { return superAdmin() || allProjectCompanyIds.contains(companyId) || projectIds.contains(projectId); }
     }

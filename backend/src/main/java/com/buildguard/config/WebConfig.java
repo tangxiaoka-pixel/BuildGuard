@@ -1,6 +1,7 @@
 package com.buildguard.config;
 
 import com.buildguard.service.AuthService;
+import com.buildguard.service.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final AuthService authService;
+    private final AuditService auditService;
 
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**").allowedOriginPatterns("*").allowedMethods("*").allowedHeaders("*");
@@ -30,6 +32,10 @@ public class WebConfig implements WebMvcConfigurer {
             public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
                 authService.require(request);
                 return true;
+            }
+            @Override
+            public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+                auditService.write(request, response.getStatus(), ex == null ? null : ex.getMessage());
             }
         };
         registry.addInterceptor(authInterceptor).addPathPatterns("/api/**")

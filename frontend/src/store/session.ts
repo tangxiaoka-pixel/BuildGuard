@@ -9,11 +9,12 @@ export const useSessionStore = defineStore('session', () => {
   const name = ref(localStorage.getItem('name') || '')
   const role = ref(localStorage.getItem('role') || '')
   const companyIds = ref<number[]>(JSON.parse(localStorage.getItem('companyIds') || '[]'))
+  const companyLevelCompanyIds = ref<number[]>(JSON.parse(localStorage.getItem('companyLevelCompanyIds') || '[]'))
   const companyModules = ref<Record<string, string[]>>(JSON.parse(localStorage.getItem('companyModules') || '{}'))
   const projectModules = ref<Record<string, string[]>>(JSON.parse(localStorage.getItem('projectModules') || '{}'))
   const context = ref<any>(JSON.parse(localStorage.getItem('buildguard-context') || JSON.stringify(defaultContext)))
 
-  function login(value: { token: string; user: string; name: string; role: string; companyIds?: number[]; companyModules?: Record<string,string[]>; projectModules?: Record<string,string[]> }) {
+  function login(value: { token: string; user: string; name: string; role: string; companyIds?: number[]; companyLevelCompanyIds?: number[]; companyModules?: Record<string,string[]>; projectModules?: Record<string,string[]> }) {
     token.value = value.token
     user.value = value.user
     localStorage.setItem('token', value.token)
@@ -24,6 +25,8 @@ export const useSessionStore = defineStore('session', () => {
     localStorage.setItem('role', value.role)
     companyIds.value = value.companyIds || []
     localStorage.setItem('companyIds', JSON.stringify(companyIds.value))
+    companyLevelCompanyIds.value = value.companyLevelCompanyIds || []
+    localStorage.setItem('companyLevelCompanyIds', JSON.stringify(companyLevelCompanyIds.value))
     companyModules.value = value.companyModules || {}
     projectModules.value = value.projectModules || {}
     localStorage.setItem('companyModules', JSON.stringify(companyModules.value))
@@ -39,5 +42,5 @@ export const useSessionStore = defineStore('session', () => {
     context.value = defaultContext
     localStorage.clear()
   }
-  return { token, user, name, role, companyIds, companyModules, projectModules, context, login, setContext, logout }
+  return { token, user, name, role, companyIds, companyLevelCompanyIds, companyModules, projectModules, context, login, setContext, logout }
 })

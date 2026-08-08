@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class ProjectSpatialAsset extends BaseEntity {
     private Long projectId;
+    private Long fileResourceId;
     private String assetType;
     private String name;
     private String fileUrl;

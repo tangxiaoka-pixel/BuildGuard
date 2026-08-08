@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.*;
 
 public interface MonitorAlarmRepository extends JpaRepository<MonitorAlarm, Long> {
+    List<MonitorAlarm> findByProjectId(Long projectId);
     List<MonitorAlarm> findByProjectIdAndMonitorType(Long projectId, String monitorType);
     List<MonitorAlarm> findByMonitorDeviceId(Long monitorDeviceId);
 }
