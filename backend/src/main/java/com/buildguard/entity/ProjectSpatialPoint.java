@@ -18,6 +18,12 @@ public class ProjectSpatialPoint extends BaseEntity {
     private Double yPercent;
     @JsonProperty("zPercent")
     private Double zPercent;
+    private String bindingMode;
+    private String componentKey;
+    private String componentName;
+    private Double anchorX;
+    private Double anchorY;
+    private Double anchorZ;
     private String status;
     private String remark;
 }
