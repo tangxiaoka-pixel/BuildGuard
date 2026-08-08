@@ -6,6 +6,7 @@ import com.buildguard.entity.IotDevice;
 import com.buildguard.repository.DeviceOfflineEventRepository;
 import com.buildguard.repository.DeviceRepository;
 import com.buildguard.repository.IotDeviceRepository;
+import com.buildguard.repository.ProjectRuntimeConfigRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,16 +15,20 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class DeviceStatusScheduler {
-    private static final int OFFLINE_MINUTES = 10;
     private final DeviceRepository devices;
     private final IotDeviceRepository iotDevices;
     private final DeviceOfflineEventRepository events;
+    private final ProjectRuntimeConfigRepository runtimeConfigs;
 
     @Scheduled(fixedDelay = 60_000)
     public void refreshOfflineStatus() {
-        LocalDateTime threshold = LocalDateTime.now().minusMinutes(OFFLINE_MINUTES);
-        devices.findAll().forEach(device -> refreshAttendanceDevice(device, threshold));
-        iotDevices.findAll().forEach(device -> refreshIotDevice(device, threshold));
+        devices.findAll().forEach(device -> refreshAttendanceDevice(device, threshold(device.getProjectId())));
+        iotDevices.findAll().forEach(device -> refreshIotDevice(device, threshold(device.getProjectId())));
+    }
+
+    private LocalDateTime threshold(Long projectId) {
+        int minutes = projectId == null ? 10 : runtimeConfigs.findByProjectId(projectId).map(c -> c.getOfflineThresholdMinutes() == null ? 10 : c.getOfflineThresholdMinutes()).orElse(10);
+        return LocalDateTime.now().minusMinutes(Math.max(1, minutes));
     }
 
     private void refreshAttendanceDevice(Device device, LocalDateTime threshold) {

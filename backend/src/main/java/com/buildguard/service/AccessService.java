@@ -17,6 +17,7 @@ public class AccessService {
     private final WorkerRepository workers;
     private final ProjectAreaRepository areas;
     private final WorkerAreaPermissionRepository permissions;
+    private final ProjectRuntimeConfigRepository runtimeConfigs;
     private final DeviceRepository devices;
     private final AttendanceRecordRepository attendance;
     private final DeviceSyncLogRepository syncLogs;
@@ -29,7 +30,8 @@ public class AccessService {
         if (!"ON_SITE".equals(worker.getStatus())) throw new BusinessException("人员不在场，禁止下发");
         if (worker.getAvatarUrl() == null || worker.getAvatarUrl().isBlank()) throw new BusinessException("人员未采集人脸照片，禁止下发设备");
         refreshEducation(worker);
-        if (!"PASSED".equals(worker.getSafetyEducationStatus())) throw new BusinessException("人员未通过安全教育，禁止下发设备");
+        boolean requireEducation=runtimeConfigs.findByProjectId(worker.getProjectId()).map(c->!Boolean.FALSE.equals(c.getRequireSafetyEducationForAccess())).orElse(true);
+        if (requireEducation && !"PASSED".equals(worker.getSafetyEducationStatus())) throw new BusinessException("人员未通过安全教育，禁止下发设备");
         List<WorkerAreaPermission> workerPermissions = permissions.findByWorkerId(workerId).stream()
                 .filter(this::isPermissionActive).toList();
         if (workerPermissions.isEmpty()) throw new BusinessException("人员未配置有效区域权限");
@@ -75,7 +77,8 @@ public class AccessService {
         if (area == null) return "设备未绑定区域";
         if (!"ON_SITE".equals(worker.getStatus())) return "人员已退场或不在场";
         refreshEducation(worker);
-        if (!"PASSED".equals(worker.getSafetyEducationStatus())) return "未通过安全教育";
+        boolean requireEducation=runtimeConfigs.findByProjectId(worker.getProjectId()).map(c->!Boolean.FALSE.equals(c.getRequireSafetyEducationForAccess())).orElse(true);
+        if (requireEducation && !"PASSED".equals(worker.getSafetyEducationStatus())) return "未通过安全教育";
         if (score != null && score < 80) return "识别分数过低";
         if (permissions.findByWorkerId(worker.getId()).stream().noneMatch(p -> area.getId().equals(p.getAreaId()) && isPermissionActive(p))) return "无区域权限";
         return null;
