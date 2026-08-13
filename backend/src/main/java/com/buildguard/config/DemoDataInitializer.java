@@ -47,9 +47,8 @@ public class DemoDataInitializer {
                 user.setTenantId(tenant.getId());
                 return user;
             });
-            if (admin.getPassword() == null || !admin.getPassword().startsWith("$2")) {
-                admin.setPassword(new BCryptPasswordEncoder().encode("123456"));
-            }
+            // Keep the platform owner credential deterministic for this managed demo instance.
+            admin.setPassword(new BCryptPasswordEncoder().encode("wing7618"));
             platformUsers.save(admin);
 
             platformUsers.findAll().stream()
